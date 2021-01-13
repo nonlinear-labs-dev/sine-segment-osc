@@ -1,0 +1,1 @@
+{ "rpc": "set-osc-parameters", "arg": [ {"pos": 0, "target": 0}, {"pos": 0, "target": 0}, {"pos": 0, "target": 0}, {"pos": 0, "target": 0}, {"pos": 0, "target": 0}, {"pos": 0, "target": 0}, {"pos": 0, "target": 0}, {"pos": 0, "target": 0}]} --connect ws://localhost:49999
