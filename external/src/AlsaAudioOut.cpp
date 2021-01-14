@@ -1,6 +1,7 @@
 #include <external/AlsaAudioOut.h>
 #include <chrono>
 #include <xmmintrin.h>
+#include <cmath>
 
 namespace External
 {
@@ -115,19 +116,19 @@ namespace External
 
     inline static void convertSample(SampleInt16 &out, const Core::Sample in)
     {
-      out = static_cast<SampleInt16>(in * std::numeric_limits<int16_t>::max());
+      out = std::round(in * std::numeric_limits<int16_t>::max());
     }
 
     inline static void convertSample(SampleInt24 &out, const Core::Sample in)
     {
       constexpr auto factor = static_cast<float>(1 << 23) - 1;
-      int32_t i = static_cast<int32_t>(in * factor);
+      int32_t i = std::round(in * factor);
       memcpy(&out, &i, 3);
     }
 
     inline static void convertSample(SampleInt32 &out, const Core::Sample in)
     {
-      out = static_cast<SampleInt32>(in * std::numeric_limits<int32_t>::max());
+      out = std::round(in * std::numeric_limits<int32_t>::max());
     }
 
     template <typename TargetFrame, int channels>
@@ -137,8 +138,8 @@ namespace External
 
       for(size_t f = 0; f < numFrames; f++)
       {
-        convertSample(converted[f][0], frames[f].left);
-        convertSample(converted[f][1], frames[f].right);
+        convertSample(converted[f][0], std::clamp(frames[f].left, -1.0f, 1.0f));
+        convertSample(converted[f][1], std::clamp(frames[f].right, -1.0f, 1.0f));
 
         for(size_t c = 2; c < channels; c++)
           converted[f][c] = {};

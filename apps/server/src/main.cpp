@@ -12,9 +12,14 @@ Core::Oscillator::Parameters toOscParams(const nlohmann::json &in)
   return ret;
 }
 
-Core::ADEnvelope::Parameters toEnvParams(const nlohmann::json &in)
+Core::ASREnvelope::Parameters toEnvParams(const nlohmann::json &in)
 {
   return { in.at("attack"), in.at("decay") };
+}
+
+Core::Synth::Parameters toSynthParams(const nlohmann::json &in)
+{
+  return { in.at("master") };
 }
 
 int main(int argc, char **argv)
@@ -34,6 +39,11 @@ int main(int argc, char **argv)
 
   server.rpc("set-env-parameters", [&](auto j) {
     synth.updateEnvParams(toEnvParams(j));
+    return nlohmann::json {};
+  });
+
+  server.rpc("set-synth-parameters", [&](auto j) {
+    synth.updateSynthParams(toSynthParams(j));
     return nlohmann::json {};
   });
 

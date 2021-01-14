@@ -25,6 +25,9 @@ class UI(tk.Tk):
 
     def get_ad_sliders(self) -> []:
         pass
+    
+    def get_synth_sliders(self) -> []:
+        pass
 
 # SynthProxy as webservice based interface for the Synth running elsewhere
 class SynthProxy:
@@ -39,11 +42,18 @@ class SynthProxy:
                 self.ws = websocket
                 
                 while self.running:
-                    rpc = self.queue.get()
-                    await self.ws.send(json.dumps(rpc))
-                    res = await self.ws.recv()
+                    await self.sendRPC()
+                    
+                    while not self.queue.empty():
+                        await self.sendRPC()
+                        
                     await self.updateUI()
-                    self.queue.task_done()
+                    
+    async def sendRPC(self):
+        rpc = self.queue.get()
+        await self.ws.send(json.dumps(rpc))
+        res = await self.ws.recv()
+        self.queue.task_done()
 
     def stop(self):
         self.running=False
@@ -82,6 +92,16 @@ class SynthProxy:
             self.queue.put_nowait(rpc)
         else:
             print("queue is full")
+            
+    def updateSynth(self, v):
+        sliders = self.ui.get_synth_sliders()
+        rpc = { "rpc": "set-synth-parameters", 
+                 "arg": { "master": sliders[0].get() }}
+        
+        if not self.queue.full():
+            self.queue.put_nowait(rpc)
+        else:
+            print("queue is full")
 
 # implementation of the actual UI
 class TkUI(UI):
@@ -97,6 +117,7 @@ class TkUI(UI):
 
         self.osc_sliders = []
         self.ad_sliders = []
+        self.synth_sliders = []
     
         elementWidth = 1024 / 8
 
@@ -112,10 +133,14 @@ class TkUI(UI):
     
         a = tk.Scale(self, from_=0, to=2000, resolution=0.01, orient='horizontal', command=synth.updateAD)
         a.place(x=0, y=700, width=200, height=50)
-        d = tk.Scale(self, from_=0, to=2000, resolution=0.01, orient='horizontal', command=synth.updateAD)
-        d.place(x=400, y=700, width=200, height=50)
+        r = tk.Scale(self, from_=0, to=2000, resolution=0.01, orient='horizontal', command=synth.updateAD)
+        r.place(x=400, y=700, width=200, height=50)
         self.ad_sliders.append(a)
-        self.ad_sliders.append(d)    
+        self.ad_sliders.append(r)    
+        
+        mainVol = tk.Scale(self, from_=0, to=1, resolution=0.01, orient='horizontal', command=synth.updateSynth)
+        mainVol.place(x=0, y=750, width=200, height=50)
+        self.synth_sliders.append(mainVol)
 
     def render_osc(self, resData):
         self.canvas.delete(tk.ALL)
@@ -136,6 +161,9 @@ class TkUI(UI):
 
     def get_ad_sliders(self) -> []:
         return self.ad_sliders
+    
+    def get_synth_sliders(self) -> []:
+        return self.synth_sliders
 
     def run(self):
         self.mainloop()

@@ -3,7 +3,7 @@
 #include <core/Audio.h>
 #include <core/Midi.h>
 #include <core/Oscillator.h>
-#include <core/ADEnvelope.h>
+#include <core/ASREnvelope.h>
 
 namespace Core
 {
@@ -13,18 +13,24 @@ namespace Core
    public:
     Synth(Core::MidiIn &in, Core::AudioOut &out);
 
+    using Parameters = std::tuple<float>;
+
     void updateOscParams(const Core::Oscillator::Parameters &param);
-    void updateEnvParams(const Core::ADEnvelope::Parameters &param);
+    void updateEnvParams(const Core::ASREnvelope::Parameters &param);
+    void updateSynthParams(const Parameters &param);
 
    private:
     Core::Oscillator m_osc;
-    Core::ADEnvelope m_env;
+    Core::ASREnvelope m_env;
+    float m_mainVol = 1.0f;
 
     struct Voice
     {
       float phase = 0;
       float freq = 0;
-      float envPos = 1000000;
+
+      float attackState = Core::ASREnvelope::c_invalidState;
+      float releaseState = Core::ASREnvelope::c_invalidState;
     };
 
     static constexpr auto c_numVoices = 128;
