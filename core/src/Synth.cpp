@@ -3,9 +3,13 @@
 
 namespace Core
 {
-  Synth::Synth(Core::MidiIn &in, Core::AudioOut &out)
-      : m_osc(out.getSampleRate())
-      , m_env(out.getSampleRate())
+  Synth::Synth(uint32_t sr)
+      : m_osc(sr)
+      , m_env(sr)
+  {
+  }
+
+  void Synth::run(MidiIn &in, AudioOut &out)
   {
     for(int i = 0; i < m_voices.size(); i++)
       m_voices[i].freq = pow(2, (i - 69) / 12.0) * 440;

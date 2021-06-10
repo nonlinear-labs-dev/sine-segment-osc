@@ -11,7 +11,9 @@ namespace Core
   class Synth
   {
    public:
-    Synth(Core::MidiIn &in, Core::AudioOut &out);
+    Synth(uint32_t sr);
+
+    void run(Core::MidiIn &in, Core::AudioOut &out);
 
     using Parameters = std::tuple<float>;
 

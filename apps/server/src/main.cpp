@@ -24,9 +24,7 @@ Core::Synth::Parameters toSynthParams(const nlohmann::json &in)
 
 int main(int argc, char **argv)
 {
-  External::AlsaMidiIn in(argc > 1 ? argv[1] : "default");
-  External::AlsaAudioOut out(argc > 2 ? argv[2] : "default", 48000);
-  Core::Synth synth(in, out);
+  Core::Synth synth(48000);
   Core::Oscillator::Parameters oscParams;
 
   External::WebSocketServer server;
@@ -62,6 +60,10 @@ int main(int argc, char **argv)
     server.quit();
     return nlohmann::json {};
   });
+
+  External::AlsaMidiIn in(argc > 1 ? argv[1] : "default");
+  External::AlsaAudioOut out(argc > 2 ? argv[2] : "default", 48000);
+  synth.run(in, out);
 
   return server.run(0, argv);
 }

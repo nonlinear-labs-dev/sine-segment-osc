@@ -52,7 +52,7 @@ namespace Core
     for(int i = 0; i < numSegments; i++)
     {
       auto nextPos = (i == numSegments - 1) ? 1 : p[i + 1].first;
-      auto xSpan = std::max(0.05f, nextPos - p[i].first);
+      auto xSpan = nextPos - p[i].first;
 
       rt->xOffset[i] = p[i].first;
       rt->xFactor[i] = c_lookupSize / xSpan;
