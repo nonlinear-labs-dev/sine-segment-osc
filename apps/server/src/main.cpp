@@ -1,6 +1,7 @@
 #include <external/AlsaMidiIn.h>
 #include <external/AlsaAudioOut.h>
 #include <external/WebSocketServer.h>
+#include <external/RawAudioDump.h>
 #include <core/Synth.h>
 #include <nlohmann/json.hpp>
 
@@ -26,8 +27,8 @@ int main(int argc, char **argv)
 {
   Core::Synth synth(48000);
   Core::Oscillator::Parameters oscParams;
-
   External::WebSocketServer server;
+  External::RawAudioDump dumper;
 
   server.rpc("set-osc-parameters", [&](auto j) {
     oscParams = toOscParams(j);
@@ -56,14 +57,26 @@ int main(int argc, char **argv)
     return r;
   });
 
+  server.rpc("start-dump", [&](auto j) {
+    dumper.start(j.at("file"));
+    return nlohmann::json {};
+  });
+
+  server.rpc("stop-dump", [&](auto j) {
+    dumper.stop();
+    return nlohmann::json {};
+  });
+
   server.rpc("quit", [&](auto j) {
     server.quit();
     return nlohmann::json {};
   });
 
-  External::AlsaMidiIn in(argc > 1 ? argv[1] : "default");
-  External::AlsaAudioOut out(argc > 2 ? argv[2] : "default", 48000);
-  synth.run(in, out);
+  External::AlsaMidiIn in(argc > 1 ? argv[1] : "default", [&](const auto &msg) { synth.doMidi(msg); });
+  External::AlsaAudioOut out(argc > 2 ? argv[2] : "default", 48000, [&](auto f, auto l) {
+    synth.doAudio(f, l);
+    dumper.dump(f, l);
+  });
 
   return server.run(0, argv);
 }

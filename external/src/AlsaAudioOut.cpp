@@ -165,8 +165,9 @@ namespace External
     }
   };
 
-  AlsaAudioOut::AlsaAudioOut(const std::string &deviceName, uint32_t rate)
-      : m_rate(rate)
+  AlsaAudioOut::AlsaAudioOut(const std::string &deviceName, uint32_t rate, CB &&cb)
+      : Core::AudioOut(std::move(cb))
+      , m_rate(rate)
   {
     snd_pcm_open(&m_handle, deviceName.c_str(), SND_PCM_STREAM_PLAYBACK, 0);
 

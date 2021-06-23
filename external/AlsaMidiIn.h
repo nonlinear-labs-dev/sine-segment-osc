@@ -9,7 +9,7 @@ namespace External
   class AlsaMidiIn : public Core::MidiIn
   {
    public:
-    AlsaMidiIn(const std::string &deviceName);
+    AlsaMidiIn(const std::string &deviceName, CB &&cb);
     ~AlsaMidiIn() override;
 
    private:

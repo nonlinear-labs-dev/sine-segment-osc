@@ -14,7 +14,7 @@ namespace External
     template <snd_pcm_format_t format, int channels> class AudioWriter;
 
    public:
-    AlsaAudioOut(const std::string &deviceName, uint32_t rate);
+    AlsaAudioOut(const std::string &deviceName, uint32_t rate, CB &&cb);
     ~AlsaAudioOut() override;
 
     uint32_t getSampleRate() const override;
