@@ -8,6 +8,11 @@ namespace External
 
   RawAudioDump::RawAudioDump() = default;
 
+  RawAudioDump::~RawAudioDump()
+  {
+    stop();
+  }
+
   void RawAudioDump::start(const std::string &file)
   {
     stop();

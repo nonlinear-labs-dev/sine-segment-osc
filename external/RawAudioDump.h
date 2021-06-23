@@ -11,6 +11,7 @@ namespace External
   {
    public:
     RawAudioDump();
+    ~RawAudioDump();
 
     void start(const std::string &file);
     void stop();
