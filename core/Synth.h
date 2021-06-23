@@ -13,13 +13,14 @@ namespace Core
    public:
     Synth(uint32_t sr);
 
-    void run(Core::MidiIn &in, Core::AudioOut &out);
-
     using Parameters = std::tuple<float>;
 
     void updateOscParams(const Core::Oscillator::Parameters &param);
     void updateEnvParams(const Core::ASREnvelope::Parameters &param);
     void updateSynthParams(const Parameters &param);
+
+    void doMidi(const MidiIn::MidiMessage &msg);
+    void doAudio(StereoFrame *tgt, size_t numFrames);
 
    private:
     Core::Oscillator m_osc;

@@ -19,21 +19,19 @@ namespace Core
    public:
     using CB = std::function<void(StereoFrame *tgt, size_t numFrames)>;
 
-    AudioOut() = default;
+    AudioOut(CB &&cb)
+        : m_cb(std::move(cb))
+    {
+    }
+
     virtual ~AudioOut() = default;
 
     virtual uint32_t getSampleRate() const = 0;
 
-    void setCB(CB cb)
-    {
-      m_cb = cb;
-    }
-
    protected:
     void fill(StereoFrame *tgt, size_t numFrames)
     {
-      if(m_cb)
-        m_cb(tgt, numFrames);
+      m_cb(tgt, numFrames);
     }
 
    private:

@@ -3,7 +3,8 @@
 namespace External
 {
 
-  AlsaMidiIn::AlsaMidiIn(const std::string &deviceName)
+  AlsaMidiIn::AlsaMidiIn(const std::string &deviceName, CB &&cb)
+      : Core::MidiIn(std::move(cb))
   {
     snd_rawmidi_t *inputHandle;
 

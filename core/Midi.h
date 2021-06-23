@@ -12,19 +12,16 @@ namespace Core
     using MidiMessage = std::vector<uint8_t>;
     using CB = std::function<void(const MidiMessage &)>;
 
-    MidiIn() = default;
-    virtual ~MidiIn() = default;
-
-    void setCB(CB cb)
+    MidiIn(CB &&cb)
+        : m_cb(std::move(cb))
     {
-      m_cb = cb;
     }
+    virtual ~MidiIn() = default;
 
    protected:
     void onMidiReceived(const MidiMessage &msg)
     {
-      if(m_cb)
-        m_cb(msg);
+      m_cb(msg);
     }
 
    private:
